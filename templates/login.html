@@ -1,0 +1,24 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Document</title>
+</head>
+<body>
+    <h2>Login</h2>
+    <form method="POST">
+    {% csrf_token %}
+    <table>
+        {{ form.as_p }}
+    </table>
+    <button type="submit">Kirish</button>
+    </form>
+    <a href="{% url 'social:begin' 'google-oauth2' %}?next=/" class="btn btn-primary">Google bilan kirish</a>
+
+    {%if form.errors%}
+        <p style="color:red;">Login yoki parol xato</p>
+    {%endif%}
+
+</body>
+</html>

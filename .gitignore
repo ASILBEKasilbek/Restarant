@@ -1,0 +1,46 @@
+# Python
+__pycache__/
+*.py[cod]
+*.pyo
+*.pyd
+*.pyc
+*.pdb
+*.egg-info/
+*.egg
+*.log
+*.pot
+*.mo
+
+# Virtualenv
+venv/
+env/
+ENV/
+.venv/
+.env/
+
+# Django migrations
+*/migrations/
+!*/migrations/__init__.py
+
+# SQLite database
+*.sqlite3
+
+# Secret settings (environment files)
+.env
+.env.*
+
+# VSCode va boshqa IDElar
+.vscode/
+.idea/
+*.swp
+
+# Media va static fayllar (agar kerak bo‘lsa)
+media/
+staticfiles/
+static/
+
+# OS fayllari
+.DS_Store
+Thumbs.db
+.env
+.env
