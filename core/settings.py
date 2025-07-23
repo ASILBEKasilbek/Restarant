@@ -137,11 +137,11 @@ LOGOUT_REDIRECT_URL = 'login'
 # https://docs.djangoproject.com/en/5.2/howto/static-files/
 
 
-
-STATIC_URL = 'restarant/static/'
-STATICFILES_DIR=BASE_DIR / 'static'
+STATIC_URL = '/restarant/static/'
+STATICFILES_DIRS = [BASE_DIR / 'static']  # ← DIQQAT: STATICFILES_DIR emas, STATICFILES_DIRS bo'lishi kerak
 STATIC_ROOT = BASE_DIR / 'staticfiles'
-MEDIA_URL = 'restarant/media/'
+
+MEDIA_URL = '/restarant/media/'
 MEDIA_ROOT = BASE_DIR / 'media'
 
 # Default primary key field type
