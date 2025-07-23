@@ -1,0 +1,36 @@
+{% extends 'base.html' %}
+{% load i18n %}
+
+{% block title %}
+    {% blocktrans with name=restaurant.name %}Popular Items at {{ name }}{% endblocktrans %}
+{% endblock %}
+
+{% block content %}
+    <h1>{% blocktrans with name=restaurant.name %}Popular Items at {{ name }}{% endblocktrans %}</h1>
+
+    <div class="row">
+        {% for item in popular_items %}
+            <div class="col-md-4 mb-3">
+                <div class="card">
+                    {% if item.image %}
+                        <img src="{{ item.image.url }}" class="card-img-top menu-item-img" alt="{{ item.name }}">
+                    {% endif %}
+                    <div class="card-body">
+                        <h5 class="card-title">{{ item.name }}</h5>
+                        <p class="card-text">{{ item.description|truncatewords:20 }}</p>
+                        <p class="card-text">{% trans "Price" %}: {{ item.price }} {% trans "UZS" %}</p>
+                        {% if item.dietary_info %}
+                            <p class="card-text"><small>{% trans "Dietary" %}: {{ item.dietary_info }}</small></p>
+                        {% endif %}
+                    </div>
+                </div>
+            </div>
+        {% empty %}
+            <p>{% trans "No popular items available." %}</p>
+        {% endfor %}
+    </div>
+
+    <a href="{% url 'restaurant:table_menu' restaurant_slug=restaurant.slug table_number='1' %}" class="btn btn-primary mt-3">
+        {% trans "View Full Menu" %}
+    </a>
+{% endblock %}

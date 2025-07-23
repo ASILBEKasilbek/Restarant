@@ -1,0 +1,43 @@
+{% extends 'base.html' %}
+{% load i18n %}
+
+{% block title %}
+    {% trans "User Profile" %}
+{% endblock %}
+
+{% block content %}
+    <h1>{% trans "User Profile" %}</h1>
+    <p>{% trans "Telegram ID" %}: {{ user.telegram_id }}</p>
+    <p>{% trans "Phone Number" %}: {{ user.phone_number|default:"Not provided" }}</p>
+    <p>{% trans "Loyalty Points" %}: {{ user.loyalty_points }}</p>
+    <p>{% trans "Total Orders" %}: {{ total_orders }}</p>
+    <p>{% trans "Total Spent" %}: {{ total_spent }} {% trans "UZS" %}</p>
+    <p>{% trans "Average Order Value" %}: {{ avg_order_value|floatformat:2 }} {% trans "UZS" %}</p>
+
+    <h3>{% trans "Recent Orders" %}</h3>
+    <ul class="list-group mb-3">
+        {% for order in orders %}
+            <li class="list-group-item">
+                {% blocktrans with id=order.id name=order.restaurant.name %}Order #{{ id }} - {{ name }}{% endblocktrans %}
+                ({{ order.get_status_display }}) - {{ order.total_price }} {% trans "UZS" %}
+                <a href="{% url 'restaurant:order_status' order_id=order.id %}" class="btn btn-sm btn-primary">{% trans "View" %}</a>
+            </li>
+        {% empty %}
+            <li class="list-group-item">{% trans "No orders yet." %}</li>
+        {% endfor %}
+    </ul>
+
+    <h3>{% trans "Recent Loyalty Transactions" %}</h3>
+    <ul class="list-group mb-3">
+        {% for transaction in transactions %}
+            <li class="list-group-item">
+                {{ transaction.points }} {% trans "points" %} ({{ transaction.get_transaction_type_display }})
+                - {{ transaction.description }} ({{ transaction.created_at|date:"Y-m-d" }})
+            </li>
+        {% empty %}
+            <li class="list-group-item">{% trans "No transactions yet." %}</li>
+        {% endfor %}
+    </ul>
+
+    <a href="{% url 'restaurant:spend_loyalty_points' %}" class="btn btn-primary mt-3">{% trans "Spend Loyalty Points" %}</a>
+{% endblock %}
