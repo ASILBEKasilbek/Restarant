@@ -6,7 +6,7 @@ from django.conf.urls.static import static
 from django.contrib.auth import views as auth_views
 from app import views
 urlpatterns = [
-    path('restarant/admin/', admin.site.urls),
+    path('admin/', admin.site.urls),
     path('', include('app.urls')),
     path('oauth/', include('social_django.urls', namespace='social')),
     path('login/', auth_views.LoginView.as_view(template_name='registration/login.html'), name='login'),
