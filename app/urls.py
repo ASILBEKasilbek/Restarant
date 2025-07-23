@@ -85,14 +85,4 @@ urlpatterns = [
         views.menu_items_api,
         name='menu_items_api'
     ),
-    path(
-        'logout/',
-        views.logout_view,
-        name='logout',
-    ),
-    path(
-        'register/',
-        views.register_view,
-        name='register',
-    ),
 ]
