@@ -18,6 +18,7 @@
         </button>
         <div class="collapse navbar-collapse" id="navbarNav">
             <ul class="navbar-nav ms-auto">
+              
                 {% if user.is_authenticated %}
                     <li class="nav-item">
                         <a class="nav-link" href="{% url 'restaurant:user_profile' %}">{% trans "Profile" %}</a>
@@ -29,10 +30,14 @@
                         <a class="nav-link" href="{% url 'logout' %}">{% trans "Logout" %}</a>
                     </li>
                 {% else %}
+                    
                     <li class="nav-item">
                         <a class="nav-link" href="{% url 'login' %}">{% trans "Login" %}</a>
                     </li>
                 {% endif %}
+                <li class="nav-item">
+                    <a class="nav-link" href="/admin/">{% trans "Admin" %}</a>
+                </li>
             </ul>
         </div>
     </div>
