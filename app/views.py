@@ -32,21 +32,36 @@ def home(request):
     restaurants = Restaurant.objects.filter(is_active=True).select_related('owner').prefetch_related('images')
     return render(request, 'restaurant/home.html', {'restaurants': restaurants})
 
-# Registration View
+from django.contrib.auth import authenticate, login
+from django.contrib import messages
+from .forms import RegistrationForm
+from .models import UserProfile
+
 def register(request):
     """Handle user registration and create UserProfile."""
     if request.method == 'POST':
         form = RegistrationForm(request.POST)
         if form.is_valid():
-            user = form.save()
+            user = form.save(commit=False)
+            password = form.cleaned_data.get('password1')
+            user.set_password(password)
+            user.save()
+
+            # Create user profile
             UserProfile.objects.create(
                 user=user,
                 phone_number=form.cleaned_data.get('phone_number'),
-                preferred_language=form.cleaned_data.get('language')  # Qo‘shildi
+                preferred_language=form.cleaned_data.get('language')
             )
-            login(request, user)
-            messages.success(request, "Ro'yxatdan o'tish muvaffaqiyatli! Xush kelibsiz!")
-            return redirect('restaurant:home')
+
+            # ✅ Autentifikatsiya (backendni avtomatik aniqlaydi)
+            user = authenticate(request, username=user.username, password=password)
+            if user is not None:
+                login(request, user)
+                messages.success(request, "Ro'yxatdan o'tish muvaffaqiyatli! Xush kelibsiz!")
+                return redirect('restaurant:home')
+            else:
+                messages.error(request, "Login muvaffaqiyatsiz. Iltimos, keyinroq urinib ko‘ring.")
     else:
         form = RegistrationForm()
     return render(request, 'registration/register.html', {'form': form})
