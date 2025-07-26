@@ -11,7 +11,7 @@ from app.views import register
 
 urlpatterns = [
     path('', include('app.urls', namespace='restaurant')),
-    path('restarant/admin/', admin.site.urls),
+    path('admin/', admin.site.urls),
     path('login/', auth_views.LoginView.as_view(template_name='registration/login.html'), name='login'),
     path('logout/', auth_views.LogoutView.as_view(), name='logout'),
     path('register/', register, name='register'),
