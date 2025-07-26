@@ -2,45 +2,57 @@
 {% load static %}
 
 {% block title %}{{ restaurant.name }} - Menyu{% endblock %}
+
 {% block content %}
-<div class="container my-4">
-    <h1>{{ restaurant.name }} - Menyu (Stol {{ table.table_number }})</h1>
+<div class="container my-5">
+    <h2 class="mb-4">{{ restaurant.name }} - Menyu (Stol {{ table.table_number }})</h2>
     <div class="row">
         {% for category in categories %}
             <div class="col-md-6 mb-4">
-                <h3>{{ category.name }}</h3>
+                <div class="border-bottom pb-2 mb-3">
+                    <h4 class="text-primary">{{ category.name }}</h4>
+                </div>
                 {% for item in category.menu_items.all %}
-                    <div class="card shadow-sm mb-3">
+                    <div class="card mb-4 shadow-sm">
                         {% if item.images.first %}
-                            <img src="{{ item.images.first.image.url }}" class="card-img-top" alt="{{ item.name }}" style="height: 150px; object-fit: cover;">
+                            <img src="{{ item.images.first.image.url }}" class="card-img-top" alt="{{ item.name }}" style="height: 180px; object-fit: cover;">
                         {% endif %}
                         <div class="card-body">
                             <h5 class="card-title">{{ item.name }}</h5>
-                            <p class="card-text">{{ item.description|truncatewords:20 }}</p>
-                            <p class="card-text">Narx: {{ item.effective_price|floatformat:2 }} so'm</p>
-                            <p class="card-text">Zaxira: {{ item.stock_quantity }}</p>
-                            <form class="add-to-cart-form" data-item-id="{{ item.id }}">
+                            <p class="card-text text-muted">{{ item.description|truncatewords:20 }}</p>
+                            <p><strong>Narx:</strong> {{ item.effective_price|floatformat:2 }} so'm</p>
+                            <p><strong>Zaxira:</strong> {{ item.stock_quantity }}</p>
+
+                            {% if cart %}
+                            <form method="POST" class="add-to-cart-form" data-item-id="{{ item.id }}">
                                 {% csrf_token %}
-                                <input type="number" name="quantity" value="1" min="1" max="{{ item.stock_quantity }}" class="form-control form-control-sm d-inline-block w-auto">
-                                <button type="submit" class="btn btn-primary btn-sm mt-1">Savatga qo'shish</button>
+                                <div class="d-flex align-items-center gap-2">
+                                    <input type="number" name="quantity" value="1" min="1" max="{{ item.stock_quantity }}" class="form-control form-control-sm w-25">
+                                    <button type="submit" class="btn btn-sm btn-outline-primary">➕ Qo‘shish</button>
+                                </div>
                             </form>
+                            {% else %}
+                            <p class="text-danger small">Savat uchun login qiling</p>
+                            {% endif %}
                         </div>
                     </div>
                 {% endfor %}
             </div>
         {% empty %}
-            <p class="text-muted">Menyu elementlari mavjud emas.</p>
+            <p class="text-muted">Hozircha menyu mavjud emas.</p>
         {% endfor %}
     </div>
-    <h2 class="my-4">Savat</h2>
-    <div class="card shadow-sm">
+
+    {% if cart %}
+    <h3 class="mt-5 mb-3">🛒 Sizning Savatingiz</h3>
+    <div class="card shadow">
         <div class="card-body">
-            <table class="table table-hover">
+            <table class="table table-striped">
                 <thead>
                     <tr>
                         <th>Element</th>
                         <th>Miqdor</th>
-                        <th>Narx</th>
+                        <th>Bir dona narx</th>
                     </tr>
                 </thead>
                 <tbody id="cart-items">
@@ -52,20 +64,22 @@
                         </tr>
                     {% empty %}
                         <tr>
-                            <td colspan="3">Savat bo'sh</td>
+                            <td colspan="3">Savat bo‘sh</td>
                         </tr>
                     {% endfor %}
                 </tbody>
             </table>
-            <p class="fw-bold">Jami: <span id="cart-total">{{ cart.total_price|floatformat:2 }}</span> so'm</p>
-            <form id="place-order-form">
+            <p class="fw-bold fs-5">Jami: <span id="cart-total">{{ cart.total_price|floatformat:2 }}</span> so'm</p>
+            <form id="place-order-form" method="POST" action="{% url 'place_order' %}">
                 {% csrf_token %}
-                <button type="submit" class="btn btn-success">Buyurtma berish</button>
+                <button type="submit" class="btn btn-success">✅ Buyurtma berish</button>
             </form>
         </div>
     </div>
+    {% endif %}
 </div>
 {% endblock %}
+
 {% block extra_js %}
 <script src="{% static 'js/customer.js' %}"></script>
 {% endblock %}

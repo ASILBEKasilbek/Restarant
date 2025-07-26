@@ -14,6 +14,10 @@ from .forms import MenuItemForm, OrderStatusForm, TableForm, StaffForm, Registra
 from django.contrib.auth.models import User
 from django.contrib.auth import login
 import json
+from django.contrib.auth import authenticate, login
+from django.contrib import messages
+from .forms import RegistrationForm
+from .models import UserProfile
 
 # Helper function to send real-time notifications
 def send_notification(group_name, message):
@@ -32,10 +36,6 @@ def home(request):
     restaurants = Restaurant.objects.filter(is_active=True).select_related('owner').prefetch_related('images')
     return render(request, 'restaurant/home.html', {'restaurants': restaurants})
 
-from django.contrib.auth import authenticate, login
-from django.contrib import messages
-from .forms import RegistrationForm
-from .models import UserProfile
 
 def register(request):
     """Handle user registration and create UserProfile."""
@@ -234,21 +234,22 @@ def table_menu(request, qr_code):
     restaurant = table.restaurant
     categories = restaurant.categories.prefetch_related('menu_items__images').all()
     
-    cart = None  # Default bo'sh, agar login bo'lsa - yaratamiz
+    cart = None
 
     if request.user.is_authenticated:
-        user_profile = get_object_or_404(UserProfile, user=request.user)
-        cart, created = Cart.objects.get_or_create(
-            user_profile=user_profile,
-            restaurant=restaurant,
-            table=table
-        )
+        user_profile = UserProfile.objects.filter(user=request.user).first()
+        if user_profile:
+            cart, _ = Cart.objects.get_or_create(
+                user_profile=user_profile,
+                restaurant=restaurant,
+                table=table
+            )
 
     return render(request, 'restaurant/customer_menu.html', {
         'restaurant': restaurant,
         'table': table,
         'categories': categories,
-        'cart': cart,  # None bo'lishi mumkin, shunga HTMLda ehtiyot bo'lish kerak
+        'cart': cart,
     })
 
 @require_POST
