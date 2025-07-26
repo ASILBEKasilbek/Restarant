@@ -6,7 +6,6 @@ app_name = 'restaurant'
 urlpatterns = [
     # Home
     path('', views.home, name='home'),
-
     # Owner Panel
     path('restaurant/<slug:slug>/owner/', views.owner_dashboard, name='owner_dashboard'),
     path('restaurant/<slug:slug>/menu/', views.manage_menu, name='manage_menu'),

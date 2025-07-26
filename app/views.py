@@ -215,24 +215,25 @@ def update_stock(request, slug, item_id):
 
 # Customer Panel Views
 def table_menu(request, qr_code):
-    """Display menu for a specific table via QR code."""
     table = get_object_or_404(Table, qr_code=qr_code)
     restaurant = table.restaurant
     categories = restaurant.categories.prefetch_related('menu_items__images').all()
-    user_profile = None
+    
+    cart = None  # Default bo'sh, agar login bo'lsa - yaratamiz
+
     if request.user.is_authenticated:
         user_profile = get_object_or_404(UserProfile, user=request.user)
-    
-    cart, created = Cart.objects.get_or_create(
-        user_profile=user_profile,
-        restaurant=restaurant,
-        table=table
-    )
+        cart, created = Cart.objects.get_or_create(
+            user_profile=user_profile,
+            restaurant=restaurant,
+            table=table
+        )
+
     return render(request, 'restaurant/customer_menu.html', {
         'restaurant': restaurant,
         'table': table,
         'categories': categories,
-        'cart': cart,
+        'cart': cart,  # None bo'lishi mumkin, shunga HTMLda ehtiyot bo'lish kerak
     })
 
 @require_POST
