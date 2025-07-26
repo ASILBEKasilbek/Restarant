@@ -1,0 +1,110 @@
+{% extends 'restaurant/base.html' %}
+{% block title %}{{ restaurant.name }} - Egasi Paneli{% endblock %}
+{% block content %}
+<div class="container my-4">
+    <h1>{{ restaurant.name }} - Egasi Paneli</h1>
+    <div class="row my-4">
+        <div class="col-md-4">
+            <div class="card shadow-sm">
+                <div class="card-body">
+                    <h5>Jami Buyurtmalar</h5>
+                    <p class="display-6">{{ statistics.jami_buyurtmalar }}</p>
+                </div>
+            </div>
+        </div>
+        <div class="col-md-4">
+            <div class="card shadow-sm">
+                <div class="card-body">
+                    <h5>Faol Buyurtmalar</h5>
+                    <p class="display-6">{{ statistics.faol_buyurtmalar }}</p>
+                </div>
+            </div>
+        </div>
+        <div class="col-md-4">
+            <div class="card shadow-sm">
+                <div class="card-body">
+                    <h5>Jami Daromad</h5>
+                    <p class="display-6">{{ statistics.jami_daromad|floatformat:2 }} so'm</p>
+                </div>
+            </div>
+        </div>
+    </div>
+    <div class="card shadow-sm mb-4">
+        <div class="card-body">
+            <h2 class="card-title">Buyurtmalar Statistikasi</h2>
+            <canvas id="revenueChart" height="100"></canvas>
+        </div>
+    </div>
+    <h2 class="my-4">So'nggi Buyurtmalar</h2>
+    <div class="card shadow-sm">
+        <div class="card-body">
+            <table class="table table-hover">
+                <thead>
+                    <tr>
+                        <th>#</th>
+                        <th>Stol</th>
+                        <th>Status</th>
+                        <th>Umumiy Narx</th>
+                        <th>Vaqt</th>
+                    </tr>
+                </thead>
+                <tbody id="orders-table">
+                    {% for order in orders %}
+                        <tr>
+                            <td>{{ order.id }}</td>
+                            <td>{{ order.table.table_number|default:"Stol yo'q" }}</td>
+                            <td>{{ order.get_status_display }}</td>
+                            <td>{{ order.total_price|floatformat:2 }} so'm</td>
+                            <td>{{ order.created_at|date:"Y-m-d H:i" }}</td>
+                        </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        </div>
+    </div>
+    <h2 class="my-4">Xodimlar</h2>
+    <div class="card shadow-sm">
+        <div class="card-body">
+            <table class="table table-hover">
+                <thead>
+                    <tr>
+                        <th>Foydalanuvchi</th>
+                        <th>Rol</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for staff_member in staff %}
+                        <tr>
+                            <td>{{ staff_member.user.username }}</td>
+                            <td>{{ staff_member.get_role_display }}</td>
+                        </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        </div>
+    </div>
+</div>
+{% endblock %}
+{% block extra_js %}
+<script src="{% static 'js/owner.js' %}"></script>
+<script>
+    const ctx = document.getElementById('revenueChart').getContext('2d');
+    new Chart(ctx, {
+        type: 'line',
+        data: {
+            labels: ['Yanvar', 'Fevral', 'Mart', 'Aprel', 'May', 'Iyun'],
+            datasets: [{
+                label: 'Daromad (so\'m)',
+                data: [100000, 150000, 200000, 180000, 220000, 250000],
+                borderColor: '#007bff',
+                backgroundColor: 'rgba(0, 123, 255, 0.1)',
+                fill: true
+            }]
+        },
+        options: {
+            responsive: true,
+            scales: { y: { beginAtZero: true } }
+        }
+    });
+</script>
+{% endblock %}

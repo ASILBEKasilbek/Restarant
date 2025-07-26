@@ -1,0 +1,40 @@
+{% extends 'restaurant/base.html' %}
+{% block title %}{{ restaurant.name }} - Stollar Boshqaruvi{% endblock %}
+{% block content %}
+<div class="container my-4">
+    <h1>{{ restaurant.name }} - Stollar Boshqaruvi</h1>
+    <div class="card shadow-sm mb-4">
+        <div class="card-body">
+            <h2 class="card-title">Yangi Stol Qo'shish</h2>
+            <form method="post">
+                {% csrf_token %}
+                {{ form.as_p }}
+                <button type="submit" class="btn btn-primary">Saqlash</button>
+            </form>
+        </div>
+    </div>
+    <h2 class="my-4">Stollar</h2>
+    <div class="card shadow-sm">
+        <div class="card-body">
+            <table class="table table-hover">
+                <thead>
+                    <tr>
+                        <th>Stol Raqami</th>
+                        <th>Sig'im</th>
+                        <th>QR Kod</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for table in tables %}
+                        <tr>
+                            <td>{{ table.table_number }}</td>
+                            <td>{{ table.capacity }}</td>
+                            <td>{{ table.qr_code }}</td>
+                        </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        </div>
+    </div>
+</div>
+{% endblock %}

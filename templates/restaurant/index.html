@@ -1,123 +1,121 @@
-{% extends 'base.html' %}
-{% load i18n static %}
-{% block title %}
-    {% trans "Welcome to Restaurant Ordering System" %}
-{% endblock %}
-
-{% block extra_css %}
+{% load static %}
+<!DOCTYPE html>
+<html lang="uz">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Restoran Tizimi - Bosh Sahifa</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
     <style>
-        .restaurant-img { max-height: 200px; object-fit: cover; }
-        .menu-item-img { max-height: 100px; object-fit: cover; }
-        .hero-section { background: url("{% static 'images/hero-bg.jpg' %}") no-repeat center center; background-size: cover; padding: 100px 0; color: white; text-align: center; }
+        .hero-section {
+            background: url('https://via.placeholder.com/1920x400') no-repeat center center;
+            background-size: cover;
+            padding: 100px 0;
+            color: white;
+            text-align: center;
+        }
+        .card-img-top {
+            height: 200px;
+            object-fit: cover;
+        }
     </style>
-{% endblock %}
-
-{% block content %}
-    <!-- Hero Section -->
-    <div class="hero-section">
-        <h1>{% trans "Discover Delicious Dining" %}</h1>
-        <p>{% trans "Explore our restaurants and order your favorite meals!" %}</p>
-        <form method="get" class="d-flex justify-content-center mb-3">
-            <div class="input-group w-50">
-                <input type="text" name="search" class="form-control" placeholder="{% trans 'Search restaurants or dishes' %}" value="{{ search_query }}">
-                <button type="submit" class="btn btn-primary">{% trans "Search" %}</button>
+</head>
+<body>
+    <!-- Navbar -->
+    <nav class="navbar navbar-expand-lg navbar-dark bg-dark">
+        <div class="container-fluid">
+            <a class="navbar-brand" href="{% url 'home' %}">Restoran Tizimi</a>
+            <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav">
+                <span class="navbar-toggler-icon"></span>
+            </button>
+            <div class="collapse navbar-collapse" id="navbarNav">
+                <ul class="navbar-nav ms-auto">
+                    {% if user.is_authenticated %}
+                        {% if user.is_superuser %}
+                            <li class="nav-item">
+                                <a class="nav-link" href="{% url 'restaurant:admin_dashboard' %}">Admin Paneli</a>
+                            </li>
+                        {% else %}
+                            {% with staff=user.staff_profiles.first %}
+                                {% if staff %}
+                                    {% if staff.role == 'waiter' %}
+                                        <li class="nav-item">
+                                            <a class="nav-link" href="{% url 'restaurant:waiter_dashboard' staff.restaurant.slug %}">Ofitsiant Paneli</a>
+                                        </li>
+                                    {% elif staff.role == 'manager' or user.owned_restaurants.exists %}
+                                        <li class="nav-item">
+                                            <a class="nav-link" href="{% url 'restaurant:owner_dashboard' staff.restaurant.slug %}">Egasi Paneli</a>
+                                        </li>
+                                    {% endif %}
+                                {% endif %}
+                            {% endwith %}
+                        {% endif %}
+                        <li class="nav-item">
+                            <a class="nav-link" href="{% url 'logout' %}">Chiqish</a>
+                        </li>
+                    {% else %}
+                        <li class="nav-item">
+                            <a class="nav-link" href="{% url 'login' %}">Kirish</a>
+                        </li>
+                        <li class="nav-item">
+                            <a class="nav-link" href="{% url 'scan_qr' %}">QR Kod Skanerlash</a>
+                        </li>
+                    {% endif %}
+                </ul>
             </div>
-        </form>
+        </div>
+    </nav>
+
+    <!-- Hero section -->
+    <div class="hero-section">
+        <div class="container">
+            <h1 class="display-4">Xush kelibsiz!</h1>
+            <p class="lead">Restoran tizimimiz orqali menyuni ko‘ring, buyurtma bering va boshqaring.</p>
+            {% if not user.is_authenticated %}
+                <a href="{% url 'scan_qr' %}" class="btn btn-primary btn-lg me-2">QR Kod Skanerlash</a>
+                <a href="{% url 'login' %}" class="btn btn-light btn-lg">Kirish</a>
+            {% endif %}
+        </div>
     </div>
 
-    <!-- Featured Restaurants -->
-    <section class="my-5">
-        <h2>{% trans "Featured Restaurants" %}</h2>
+    <!-- Restoranlar ro'yxati -->
+    <div class="container mt-5">
+        <h2 class="mb-4">Restoranlar</h2>
         <div class="row">
             {% for restaurant in restaurants %}
-                <div class="col-md-4 mb-3">
-                    <div class="card">
-                        {% if restaurant.cover_image %}
-                            <img src="{{ restaurant.cover_image.url }}" class="card-img-top restaurant-img" alt="{{ restaurant.name }}">
-                        {% endif %}
+                <div class="col-md-4 mb-4">
+                    <div class="card h-100 shadow-sm">
+                        {% with image=restaurant.images.first %}
+                            {% if image %}
+                                <img src="{{ image.image.url }}" class="card-img-top" alt="{{ restaurant.name }}">
+                            {% else %}
+                                <img src="https://via.placeholder.com/400x200?text=Rasm+mavjud+emas" class="card-img-top" alt="Rasm yo'q">
+                            {% endif %}
+                        {% endwith %}
                         <div class="card-body">
                             <h5 class="card-title">{{ restaurant.name }}</h5>
                             <p class="card-text">{{ restaurant.address|truncatewords:20 }}</p>
-                            <p class="card-text">{% trans "Rating" %}: {{ restaurant.average_rating }} / 5</p>
-                            <p class="card-text">{% trans "Opening Hours" %}: {{ restaurant.opening_hours|default:"Not specified" }}</p>
-                            <a href="{% url 'restaurant:table_menu' restaurant_slug=restaurant.slug table_number='1' %}" class="btn btn-primary">
-                                {% trans "View Menu" %}
-                            </a>
-                            <a href="{% url 'restaurant:restaurant_ratings' restaurant_slug=restaurant.slug %}" class="btn btn-secondary">
-                                {% trans "View Ratings" %}
-                            </a>
+                            <p class="card-text">Ish vaqti: {{ restaurant.opening_hours }}</p>
+                            <p class="card-text">
+                                O'rtacha baho:
+                                {% if restaurant.average_rating %}
+                                    {{ restaurant.average_rating }}/5
+                                {% else %}
+                                    Baholanmagan
+                                {% endif %}
+                            </p>
                         </div>
                     </div>
                 </div>
             {% empty %}
-                <p>{% trans "No restaurants available." %}</p>
-            {% endfor %}
-        </div>
-    </section>
-
-    <!-- Popular Items -->
-    <section class="my-5">
-        <h2>{% trans "Popular Dishes" %}</h2>
-        <div class="row">
-            {% for item in popular_items %}
-                <div class="col-md-4 mb-3">
-                    <div class="card">
-                        {% if item.image %}
-                            <img src="{{ item.image.url }}" class="card-img-top menu-item-img" alt="{{ item.name }}">
-                        {% endif %}
-                        <div class="card-body">
-                            <h5 class="card-title">{{ item.name }}</h5>
-                            <p class="card-text">{{ item.description|truncatewords:20 }}</p>
-                            <p class="card-text">{% trans "Price" %}: {{ item.price }} {% trans "UZS" %}</p>
-                            <p class="card-text">{% trans "Restaurant" %}: {{ item.restaurant.name }}</p>
-                            {% if item.dietary_info %}
-                                <p class="card-text"><small>{% trans "Dietary" %}: {{ item.dietary_info }}</small></p>
-                            {% endif %}
-                            {% if user.is_authenticated %}
-                                <form action="{% url 'restaurant:add_to_cart' restaurant_slug=item.restaurant.slug %}" method="post" class="add-to-cart-form">
-                                    {% csrf_token %}
-                                    <input type="hidden" name="menu_item_id" value="{{ item.id }}">
-                                    <div class="input-group">
-                                        <input type="number" name="quantity" value="1" min="1" class="form-control">
-                                        <button type="submit" class="btn btn-success">{% trans "Add to Cart" %}</button>
-                                    </div>
-                                </form>
-                            {% endif %}
-                        </div>
-                    </div>
+                <div class="col-12">
+                    <div class="alert alert-info">Hech qanday restoran topilmadi.</div>
                 </div>
-            {% empty %}
-                <p>{% trans "No popular items available." %}</p>
             {% endfor %}
         </div>
-    </section>
+    </div>
 
-    {% if user.is_authenticated %}
-        <a href="{% url 'restaurant:user_profile' %}" class="btn btn-primary mt-3">{% trans "Go to Profile" %}</a>
-        <a href="{% url 'restaurant:create_delivery_order' %}" class="btn btn-primary mt-3">{% trans "Order Delivery" %}</a>
-    {% else %}
-        <a href="{% url 'login' %}" class="btn btn-primary mt-3">{% trans "Login to Order" %}</a>
-    {% endif %}
-{% endblock %}
-
-{% block extra_js %}
-    <script>
-        document.querySelectorAll('.add-to-cart-form').forEach(form => {
-            form.addEventListener('submit', async (e) => {
-                e.preventDefault();
-                const formData = new FormData(form);
-                const response = await fetch(form.action, {
-                    method: 'POST',
-                    body: formData,
-                    headers: { 'X-CSRFToken': '{{ csrf_token }}' }
-                });
-                const data = await response.json();
-                if (data.message) {
-                    alert(data.message);
-                } else {
-                    alert(data.error);
-                }
-            });
-        });
-    </script>
-{% endblock %}
+    <!-- Bootstrap JS -->
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+</body>
+</html>

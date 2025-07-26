@@ -1,0 +1,47 @@
+<!DOCTYPE html>
+    <html lang="uz">
+    <head>
+        <meta charset="UTF-8">
+        <meta name="viewport" content="width=device-width, initial-scale=1.0">
+        <title>QR Kod Skanerlash</title>
+        <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    </head>
+    <body>
+        <div class="container mt-4 text-center">
+            <h1>QR Kodni Skanerlang</h1>
+            <p>Stoldagi QR kodni skanerlash uchun kamerani yoqing.</p>
+            <video id="video" width="100%" autoplay></video>
+            <canvas id="canvas" style="display: none;"></canvas>
+            <button id="start-scan" class="btn btn-primary mt-3">Skanerlashni Boshlash</button>
+            <a href="{% url 'home' %}" class="btn btn-secondary mt-3">Orqaga</a>
+        </div>
+        <script src="https://cdn.jsdelivr.net/npm/jsqr@1.4.0/dist/jsQR.min.js"></script>
+        <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+        <script>
+            $(document).ready(function() {
+                const video = document.getElementById('video');
+                const canvas = document.getElementById('canvas');
+                const context = canvas.getContext('2d');
+                $('#start-scan').click(function() {
+                    navigator.mediaDevices.getUserMedia({ video: { facingMode: 'environment' } })
+                        .then(stream => {
+                            video.srcObject = stream;
+                            video.play();
+                            scanQR();
+                        })
+                        .catch(err => alert('Kamera xatosi: ' + err));
+                });
+                function scanQR() {
+                    context.drawImage(video, 0, 0, canvas.width, canvas.height);
+                    const imageData = context.getImageData(0, 0, canvas.width, canvas.height);
+                    const code = jsQR(imageData.data, imageData.width, imageData.height);
+                    if (code) {
+                        window.location.href = code.data; // Redirect to table_menu
+                    } else {
+                        requestAnimationFrame(scanQR);
+                    }
+                }
+            });
+        </script>
+    </body>
+    </html>

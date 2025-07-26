@@ -1,24 +1,45 @@
-<!DOCTYPE html>
-<html lang="en">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Document</title>
-</head>
-<body>
-    <h2>Login</h2>
-    <form method="POST">
-    {% csrf_token %}
-    <table>
-        {{ form.as_p }}
-    </table>
-    <button type="submit">Kirish</button>
-    </form>
-    <a href="{% url 'social:begin' 'google-oauth2' %}?next=/" class="btn btn-primary">Google bilan kirish</a>
-
-    {%if form.errors%}
-        <p style="color:red;">Login yoki parol xato</p>
-    {%endif%}
-
-</body>
-</html>
+{% extends 'restaurant/base.html' %}
+{% block title %}Kirish{% endblock %}
+{% block content %}
+<div class="container my-4">
+    <h1 class="mb-4">Kirish</h1>
+    <div class="card shadow-sm">
+        <div class="card-body">
+            <form method="post">
+                {% csrf_token %}
+                <div class="mb-3">
+                    <label for="{{ form.username.id_for_label }}" class="form-label">{{ form.username.label }}</label>
+                    {{ form.username }}
+                    {% if form.username.errors %}
+                        <div class="invalid-feedback d-block">
+                            {% for error in form.username.errors %}
+                                {{ error }}
+                            {% endfor %}
+                        </div>
+                    {% endif %}
+                </div>
+                <div class="mb-3">
+                    <label for="{{ form.password.id_for_label }}" class="form-label">{{ form.password.label }}</label>
+                    {{ form.password }}
+                    {% if form.password.errors %}
+                        <div class="invalid-feedback d-block">
+                            {% for error in form.password.errors %}
+                                {{ error }}
+                            {% endfor %}
+                        </div>
+                    {% endif %}
+                </div>
+                {% if form.non_field_errors %}
+                    <div class="invalid-feedback d-block">
+                        {% for error in form.non_field_errors %}
+                            {{ error }}
+                        {% endfor %}
+                    </div>
+                {% endif %}
+                <button type="submit" class="btn btn-primary">Kirish</button>
+                <a href="{% url 'register' %}" class="btn btn-link">Hisobingiz yo'qmi? Ro'yxatdan o'ting</a>
+            </form>
+        </div>
+    </div>
+</div>
+{% endblock %}

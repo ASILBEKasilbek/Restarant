@@ -1,0 +1,82 @@
+{% extends 'restaurant/base.html' %}
+{% block title %}Ro'yxatdan o'tish{% endblock %}
+{% block content %}
+<div class="container my-4">
+    <h1 class="mb-4">Ro'yxatdan o'tish</h1>
+    <div class="card shadow-sm">
+        <div class="card-body">
+            <form method="post">
+                {% csrf_token %}
+                <div class="mb-3">
+                    <label for="{{ form.username.id_for_label }}" class="form-label">{{ form.username.label }}</label>
+                    {{ form.username }}
+                    {% if form.username.errors %}
+                        <div class="invalid-feedback d-block">
+                            {% for error in form.username.errors %}
+                                {{ error }}
+                            {% endfor %}
+                        </div>
+                    {% endif %}
+                </div>
+                <div class="mb-3">
+                    <label for="{{ form.email.id_for_label }}" class="form-label">{{ form.email.label }}</label>
+                    {{ form.email }}
+                    {% if form.email.errors %}
+                        <div class="invalid-feedback d-block">
+                            {% for error in form.email.errors %}
+                                {{ error }}
+                            {% endfor %}
+                        </div>
+                    {% endif %}
+                </div>
+                <div class="mb-3">
+                    <label for="{{ form.phone_number.id_for_label }}" class="form-label">{{ form.phone_number.label }}</label>
+                    {{ form.phone_number }}
+                    {% if form.phone_number.errors %}
+                        <div class="invalid-feedback d-block">
+                            {% for error in form.phone_number.errors %}
+                                {{ error }}
+                            {% endfor %}
+                        </div>
+                    {% endif %}
+                </div>
+                <div class="mb-3">
+                    <label for="{{ form.language.id_for_label }}" class="form-label">{{ form.language.label }}</label>
+                    {{ form.language }}
+                    {% if form.language.errors %}
+                        <div class="invalid-feedback d-block">
+                            {% for error in form.language.errors %}
+                                {{ error }}
+                            {% endfor %}
+                        </div>
+                    {% endif %}
+                </div>
+                <div class="mb-3">
+                    <label for="{{ form.password1.id_for_label }}" class="form-label">{{ form.password1.label }}</label>
+                    {{ form.password1 }}
+                    {% if form.password1.errors %}
+                        <div class="invalid-feedback d-block">
+                            {% for error in form.password1.errors %}
+                                {{ error }}
+                            {% endfor %}
+                        </div>
+                    {% endif %}
+                </div>
+                <div class="mb-3">
+                    <label for="{{ form.password2.id_for_label }}" class="form-label">{{ form.password2.label }}</label>
+                    {{ form.password2 }}
+                    {% if form.password2.errors %}
+                        <div class="invalid-feedback d-block">
+                            {% for error in form.password2.errors %}
+                                {{ error }}
+                            {% endfor %}
+                        </div>
+                    {% endif %}
+                </div>
+                <button type="submit" class="btn btn-primary">Ro'yxatdan o'tish</button>
+                <a href="{% url 'login' %}" class="btn btn-link">Allaqachon hisobingiz bormi? Kirish</a>
+            </form>
+        </div>
+    </div>
+</div>
+{% endblock %}

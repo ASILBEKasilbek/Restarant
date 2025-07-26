@@ -26,7 +26,9 @@ SECRET_KEY = os.getenv('SECRET_KEY')
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = True
 
-ALLOWED_HOSTS = ["*"]
+
+ALLOWED_HOSTS = ["127.0.0.1", "localhost", "[::1]",'3.112.252.179']
+
 
 
 # Application definition
@@ -41,7 +43,7 @@ INSTALLED_APPS = [
     'django.contrib.messages',
     'django.contrib.staticfiles',
     'app',
-    'social_django',
+    'channels',
 ]
 
 MIDDLEWARE = [
@@ -79,6 +81,8 @@ AUTHENTICATION_BACKENDS = (
     'social_core.backends.google.GoogleOAuth2',
     'django.contrib.auth.backends.ModelBackend',
 )
+
+ASGI_APPLICATION = 'core.asgi.application'
 
 WSGI_APPLICATION = 'core.wsgi.application'
 
@@ -125,18 +129,26 @@ USE_I18N = True
 USE_TZ = True
 
 
-SOCIAL_AUTH_GOOGLE_OAUTH2_KEY = os.getenv('SOCIAL_AUTH_GOOGLE_OAUTH2_KEY')
-SOCIAL_AUTH_GOOGLE_OAUTH2_SECRET = os.getenv('SOCIAL_AUTH_GOOGLE_OAUTH2_SECRET')
-SOCIAL_AUTH_REDIRECT_IS_HTTPS = False
-
-LOGIN_URL='login'
-LOGIN_REDIRECT_URL ='index'
-LOGOUT_REDIRECT_URL = 'login'
+LOGIN_REDIRECT_URL = '/'
+LOGOUT_REDIRECT_URL = '/'
 
 # Static files (CSS, JavaScript, Images)
 # https://docs.djangoproject.com/en/5.2/howto/static-files/
 
-
+USE_I18N = True
+LANGUAGES = [
+    ('uz', 'O‘zbek'),
+    ('ru', 'Русский'),
+    ('en', 'English'),
+]
+CHANNEL_LAYERS = {
+    'default': {
+        'BACKEND': 'channels_redis.core.RedisChannelLayer',
+        'CONFIG': {
+            'hosts': [('127.0.0.1', 6379)],
+        },
+    },
+}
 STATIC_URL = '/restarant/static/'
 STATICFILES_DIRS = [BASE_DIR / 'static']  # ← DIQQAT: STATICFILES_DIR emas, STATICFILES_DIRS bo'lishi kerak
 STATIC_ROOT = BASE_DIR / 'staticfiles'

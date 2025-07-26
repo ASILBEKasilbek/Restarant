@@ -1,22 +1,20 @@
-from django.contrib import admin
-from django.urls import path
 from django.conf import settings
-from django.urls import include
 from django.conf.urls.static import static
+from django.urls import include
+from django.contrib.auth.views import LoginView, LogoutView
+from app.views import home,table_menu
+from django.contrib import admin
+from django.urls import path, include
 from django.contrib.auth import views as auth_views
-from app import views
+from app.views import register
+
+
 urlpatterns = [
+    path('', include('app.urls', namespace='restaurant')),
     path('admin/', admin.site.urls),
-    path('', include('app.urls')),
-    path('oauth/', include('social_django.urls', namespace='social')),
     path('login/', auth_views.LoginView.as_view(template_name='registration/login.html'), name='login'),
-    path('logout/',views.logout_view,name='logout'),
-    path(
-        'register/',
-        views.register_view,
-        name='register',
-    ),
-    
+    path('logout/', auth_views.LogoutView.as_view(), name='logout'),
+    path('register/', register, name='register'),
 ]
 if settings.DEBUG:
     urlpatterns += static(settings.STATIC_URL, document_root=settings.STATIC_ROOT)

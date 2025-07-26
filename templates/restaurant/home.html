@@ -1,0 +1,32 @@
+{% extends 'restaurant/base.html' %}
+{% block title %}Restoranlar{% endblock %}
+{% block content %}
+<div class="container my-4">
+    <h1 class="mb-4">Faol Restoranlar</h1>
+    <div class="row">
+        {% for restaurant in restaurants %}
+            <div class="col-md-4 mb-4">
+                <div class="card shadow-sm">
+                    {% if restaurant.images.first %}
+                        <img src="{{ restaurant.images.first.image.url }}" class="card-img-top" alt="{{ restaurant.name }}" style="height: 200px; object-fit: cover;">
+                    {% else %}
+                        <div class="card-img-top bg-secondary" style="height: 200px;"></div>
+                    {% endif %}
+                    <div class="card-body">
+                        <h5 class="card-title">{{ restaurant.name }}</h5>
+                        <p class="card-text">{{ restaurant.address|truncatewords:10 }}</p>
+                        <p class="card-text">O'rtacha baho: {{ restaurant.average_rating|floatformat:1 }}/5</p>
+                        {% if restaurant.tables.first and restaurant.tables.first.qr_code %}
+                            <a href="{% url 'restaurant:table_menu' qr_code=restaurant.tables.first.qr_code %}" class="btn btn-primary">Menyuni ko'rish</a>
+                        {% else %}
+                            <span class="btn btn-secondary disabled">Menyu mavjud emas</span>
+                        {% endif %}
+                    </div>
+                </div>
+            </div>
+        {% empty %}
+            <p class="text-muted">Hozirda faol restoranlar yo'q.</p>
+        {% endfor %}
+    </div>
+</div>
+{% endblock %}

@@ -1,88 +1,31 @@
 from django.urls import path
 from . import views
-from django.contrib.auth import views as auth_views
 
 app_name = 'restaurant'
 
 urlpatterns = [
-    # Homepage
-    path('', views.index, name='index'),
-    # Table menu view with restaurant slug and table number
-    path(
-        'menu/<slug:restaurant_slug>/table/<str:table_number>/',
-        views.table_menu,
-        name='table_menu'
-    ),
-    # Add to cart
-    path(
-        'cart/add/<slug:restaurant_slug>/',
-        views.add_to_cart,
-        name='add_to_cart'
-    ),
-    # Create order (table or general)
-    path(
-        'order/create/<slug:restaurant_slug>/',
-        views.create_order,
-        name='create_order'
-    ),
-    # Create delivery order
-    path(
-        'order/delivery/',
-        views.create_delivery_order,
-        name='create_delivery_order'
-    ),
-    # Order status
-    path(
-        'order/<int:order_id>/status/',
-        views.order_status,
-        name='order_status'
-    ),
-    # Cancel order
-    path(
-        'order/<int:order_id>/cancel/',
-        views.cancel_order,
-        name='cancel_order'
-    ),
-    # Update order status
-    path(
-        'order/<int:order_id>/update-status/',
-        views.update_order_status,
-        name='update_order_status'
-    ),
-    # Submit review
-    path(
-        'order/<int:order_id>/review/',
-        views.submit_review,
-        name='submit_review'
-    ),
-    # Restaurant ratings
-    path(
-        'restaurant/<slug:restaurant_slug>/ratings/',
-        views.restaurant_ratings,
-        name='restaurant_ratings'
-    ),
-    # Spend loyalty points
-    path(
-        'loyalty/spend/',
-        views.spend_loyalty_points,
-        name='spend_loyalty_points'
-    ),
-    # User profile
-    path(
-        'profile/',
-        views.user_profile,
-        name='user_profile'
-    ),
-    # Popular items
-    path(
-        'restaurant/<slug:restaurant_slug>/popular/',
-        views.popular_items,
-        name='popular_items'
-    ),
-    # Menu items API
-    path(
-        'api/menu/<slug:restaurant_slug>/',
-        views.menu_items_api,
-        name='menu_items_api'
-    ),
+    # Home
+    path('', views.home, name='home'),
+
+    # Owner Panel
+    path('restaurant/<slug:slug>/owner/', views.owner_dashboard, name='owner_dashboard'),
+    path('restaurant/<slug:slug>/menu/', views.manage_menu, name='manage_menu'),
+    path('restaurant/<slug:slug>/menu/delete/<int:item_id>/', views.delete_menu_item, name='delete_menu_item'),
+    path('restaurant/<slug:slug>/staff/', views.manage_staff, name='manage_staff'),
+    path('restaurant/<slug:slug>/tables/', views.manage_tables, name='manage_tables'),
+
+    # Waiter Panel
+    path('restaurant/<slug:slug>/waiter/', views.waiter_dashboard, name='waiter_dashboard'),
+    path('restaurant/<slug:slug>/order/<int:order_id>/update-status/', views.update_order_status, name='update_order_status'),
+    path('restaurant/<slug:slug>/stock/<int:item_id>/update/', views.update_stock, name='update_stock'),
+
+    # Customer Panel
+    path('table/<str:qr_code>/', views.table_menu, name='table_menu'),
+    path('table/<str:qr_code>/add-to-cart/', views.add_to_cart, name='add_to_cart'),
+    path('table/<str:qr_code>/place-order/', views.place_order, name='place_order'),
+    path('order-history/', views.order_history, name='order_history'),
+
+    # Admin Panel
+    path('admin/dashboard/', views.admin_dashboard, name='admin_dashboard'),
+    path('admin/restaurants/', views.admin_manage_restaurants, name='admin_manage_restaurants'),
 ]

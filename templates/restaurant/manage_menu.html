@@ -1,0 +1,47 @@
+{% extends 'restaurant/base.html' %}
+{% block title %}{{ restaurant.name }} - Menyu Boshqaruvi{% endblock %}
+{% block content %}
+<div class="container my-4">
+    <h1>{{ restaurant.name }} - Menyu Boshqaruvi</h1>
+    <div class="card shadow-sm mb-4">
+        <div class="card-body">
+            <h2 class="card-title">Yangi Menyu Elementi Qo'shish</h2>
+            <form method="post" enctype="multipart/form-data">
+                {% csrf_token %}
+                {{ form.as_p }}
+                <button type="submit" class="btn btn-primary">Saqlash</button>
+            </form>
+        </div>
+    </div Pragmasoft
+    </div>
+    <h2 class="my-4">Menyu Elementlari</h2>
+    <div class="card shadow-sm">
+        <div class="card-body">
+            <table class="table table-hover">
+                <thead>
+                    <tr>
+                        <th>Nomi</th>
+                        <th>Kategoriya</th>
+                        <th>Narx</th>
+                        <th>Zaxira</th>
+                        <th>Amallar</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for item in menu_items %}
+                        <tr>
+                            <td>{{ item.name }}</td>
+                            <td>{{ item.category.name|default:"Kategoriyasiz" }}</td>
+                            <td>{{ item.effective_price|floatformat:2 }} so'm</td>
+                            <td>{{ item.stock_quantity }}</td>
+                            <td>
+                                <a href="{% url 'restaurant:delete_menu_item' slug=restaurant.slug item_id=item.id %}" class="btn btn-sm btn-danger" onclick="return confirm('Haqiqatan ham o\'chirishni xohlaysizmi?')">O'chirish</a>
+                            </td>
+                        </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        </div>
+    </div>
+</div>
+{% endblock %}

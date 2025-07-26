@@ -1,0 +1,76 @@
+{% extends 'restaurant/base.html' %}
+{% block title %}{{ restaurant.name }} - Ofitsiant Paneli{% endblock %}
+{% block content %}
+<div class="container my-4">
+    <h1>{{ restaurant.name }} - Ofitsiant Paneli</h1>
+    <h2 class="my-4">Faol Buyurtmalar</h2>
+    <div class="card shadow-sm mb-4">
+        <div class="card-body">
+            <table class="table table-hover">
+                <thead>
+                    <tr>
+                        <th>#</th>
+                        <th>Stol</th>
+                        <th>Status</th>
+                        <th>Umumiy Narx</th>
+                        <th>Amallar</th>
+                    </tr>
+                </thead>
+                <tbody id="orders-table">
+                    {% for order in orders %}
+                        <tr data-order-id="{{ order.id }}">
+                            <td>{{ order.id }}</td>
+                            <td>{{ order.table.table_number|default:"Stol yo'q" }}</td>
+                            <td>{{ order.get_status_display }}</td>
+                            <td>{{ order.total_price|floatformat:2 }} so'm</td>
+                            <td>
+                                <form class="update-status-form" data-order-id="{{ order.id }}">
+                                    {% csrf_token %}
+                                    <select name="status" class="form-select form-select-sm">
+                                        {% for status, label in order.STATUS_CHOICES %}
+                                            <option value="{{ status }}" {% if order.status == status %}selected{% endif %}>{{ label }}</option>
+                                        {% endfor %}
+                                    </select>
+                                    <button type="submit" class="btn btn-sm btn-primary mt-1">Yangilash</button>
+                                </form>
+                            </td>
+                        </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        </div>
+    </div>
+    <h2 class="my-4">Menyu Elementlari (Zaxira)</h2>
+    <div class="card shadow-sm">
+        <div class="card-body">
+            <table class="table table-hover">
+                <thead>
+                    <tr>
+                        <th>Nomi</th>
+                        <th>Zaxira</th>
+                        <th>Amallar</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for item in menu_items %}
+                        <tr>
+                            <td>{{ item.name }}</td>
+                            <td>{{ item.stock_quantity }}</td>
+                            <td>
+                                <form class="update-stock-form" data-item-id="{{ item.id }}">
+                                    {% csrf_token %}
+                                    <input type="number" name="quantity" class="form-control form-control-sm d-inline-block w-auto" min="-{{ item.stock_quantity }}" max="100" value="0">
+                                    <button type="submit" class="btn btn-sm btn-primary mt-1">Yangilash</button>
+                                </form>
+                            </td>
+                        </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        </div>
+    </div>
+</div>
+{% endblock %}
+{% block extra_js %}
+<script src="{% static 'js/waiter.js' %}"></script>
+{% endblock %}

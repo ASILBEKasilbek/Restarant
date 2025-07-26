@@ -1,0 +1,31 @@
+{% extends 'restaurant/base.html' %}
+{% block title %}Restoranlar Boshqaruvi{% endblock %}
+{% block content %}
+<div class="container my-4">
+    <h1>Restoranlar Boshqaruvi</h1>
+    <div class="card shadow-sm">
+        <div class="card-body">
+            <table class="table table-hover">
+                <thead>
+                    <tr>
+                        <th>Nomi</th>
+                        <th>Manzil</th>
+                        <th>Egasi</th>
+                        <th>Faol</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for restaurant in restaurants %}
+                        <tr>
+                            <td>{{ restaurant.name }}</td>
+                            <td>{{ restaurant.address|truncatewords:10 }}</td>
+                            <td>{{ restaurant.owner.username|default:"Egasi yo'q" }}</td>
+                            <td>{{ restaurant.is_active|yesno:"Ha,Yo'q" }}</td>
+                        </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        </div>
+    </div>
+</div>
+{% endblock %}
