@@ -5,43 +5,56 @@
 
 {% block content %}
 <div class="container my-5">
-    <h2 class="mb-4">{{ restaurant.name }} - Menyu (Stol {{ table.table_number }})</h2>
-    <div class="row">
-        {% for category in categories %}
-            <div class="col-md-6 mb-4">
-                <div class="border-bottom pb-2 mb-3">
-                    <h4 class="text-primary">{{ category.name }}</h4>
-                </div>
-                {% for item in category.menu_items.all %}
-                    <div class="card mb-4 shadow-sm">
-                        {% if item.images.first %}
-                            <img src="{{ item.images.first.image.url }}" class="card-img-top" alt="{{ item.name }}" style="height: 180px; object-fit: cover;">
-                        {% endif %}
-                        <div class="card-body">
-                            <h5 class="card-title">{{ item.name }}</h5>
-                            <p class="card-text text-muted">{{ item.description|truncatewords:20 }}</p>
-                            <p><strong>Narx:</strong> {{ item.effective_price|floatformat:2 }} so'm</p>
-                            <p><strong>Zaxira:</strong> {{ item.stock_quantity }}</p>
+    <h2 class="mb-4 text-center">{{ restaurant.name }} - Menyu (Stol {{ table.table_number }})</h2>
 
-                            {% if cart %}
-                            <form method="POST" class="add-to-cart-form" data-item-id="{{ item.id }}">
-                                {% csrf_token %}
-                                <div class="d-flex align-items-center gap-2">
-                                    <input type="number" name="quantity" value="1" min="1" max="{{ item.stock_quantity }}" class="form-control form-control-sm w-25">
-                                    <button type="submit" class="btn btn-sm btn-outline-primary">➕ Qo‘shish</button>
+    {% if categories %}
+    <div class="accordion" id="menuAccordion">
+        {% for category in categories %}
+        <div class="accordion-item mb-3">
+            <h2 class="accordion-header" id="heading{{ forloop.counter }}">
+                <button class="accordion-button {% if not forloop.first %}collapsed{% endif %}" type="button" data-bs-toggle="collapse" data-bs-target="#collapse{{ forloop.counter }}" aria-expanded="{{ forloop.first|yesno:'true,false' }}" aria-controls="collapse{{ forloop.counter }}">
+                    {{ category.name }}
+                </button>
+            </h2>
+            <div id="collapse{{ forloop.counter }}" class="accordion-collapse collapse {% if forloop.first %}show{% endif %}" aria-labelledby="heading{{ forloop.counter }}" data-bs-parent="#menuAccordion">
+                <div class="accordion-body">
+                    <div class="row">
+                        {% for item in category.menu_items.all %}
+                        <div class="col-sm-12 col-md-6 col-lg-4 mb-4">
+                            <div class="card h-100 shadow-sm rounded">
+                                {% if item.images.first %}
+                                <img src="{{ item.images.first.image.url }}" class="card-img-top" style="height: 180px; object-fit: cover;" alt="{{ item.name }}">
+                                {% endif %}
+                                <div class="card-body d-flex flex-column">
+                                    <h5 class="card-title">{{ item.name }}</h5>
+                                    <p class="card-text text-muted small">{{ item.description|truncatewords:20 }}</p>
+                                    <p><strong>Narx:</strong> {{ item.effective_price|floatformat:2 }} so'm</p>
+                                    <p><strong>Zaxira:</strong> {{ item.stock_quantity }}</p>
+
+                                    {% if cart %}
+                                    <form method="POST" class="mt-auto add-to-cart-form" data-item-id="{{ item.id }}">
+                                        {% csrf_token %}
+                                        <div class="d-flex align-items-center gap-2">
+                                            <input type="number" name="quantity" value="1" min="1" max="{{ item.stock_quantity }}" class="form-control form-control-sm w-25">
+                                            <button type="submit" class="btn btn-sm btn-outline-primary">➕ Qo‘shish</button>
+                                        </div>
+                                    </form>
+                                    {% else %}
+                                    <p class="text-danger small mt-auto">Savat uchun login qiling</p>
+                                    {% endif %}
                                 </div>
-                            </form>
-                            {% else %}
-                            <p class="text-danger small">Savat uchun login qiling</p>
-                            {% endif %}
+                            </div>
                         </div>
+                        {% endfor %}
                     </div>
-                {% endfor %}
+                </div>
             </div>
-        {% empty %}
-            <p class="text-muted">Hozircha menyu mavjud emas.</p>
+        </div>
         {% endfor %}
     </div>
+    {% else %}
+    <p class="text-muted">Hozircha menyu mavjud emas.</p>
+    {% endif %}
 
     {% if cart %}
     <h3 class="mt-5 mb-3">🛒 Sizning Savatingiz</h3>
@@ -57,20 +70,20 @@
                 </thead>
                 <tbody id="cart-items">
                     {% for item in cart.items.all %}
-                        <tr>
-                            <td>{{ item.menu_item.name }}</td>
-                            <td>{{ item.quantity }}</td>
-                            <td>{{ item.menu_item.effective_price|floatformat:2 }} so'm</td>
-                        </tr>
+                    <tr>
+                        <td>{{ item.menu_item.name }}</td>
+                        <td>{{ item.quantity }}</td>
+                        <td>{{ item.menu_item.effective_price|floatformat:2 }} so'm</td>
+                    </tr>
                     {% empty %}
-                        <tr>
-                            <td colspan="3">Savat bo‘sh</td>
-                        </tr>
+                    <tr>
+                        <td colspan="3">Savat bo‘sh</td>
+                    </tr>
                     {% endfor %}
                 </tbody>
             </table>
             <p class="fw-bold fs-5">Jami: <span id="cart-total">{{ cart.total_price|floatformat:2 }}</span> so'm</p>
-            <form id="place-order-form" method="POST" action="{% url 'place_order' %}">
+            <form id="place-order-form" method="POST" action="{% url 'place_order' qr_code %}">
                 {% csrf_token %}
                 <button type="submit" class="btn btn-success">✅ Buyurtma berish</button>
             </form>

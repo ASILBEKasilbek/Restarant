@@ -244,12 +244,13 @@ def table_menu(request, qr_code):
                 restaurant=restaurant,
                 table=table
             )
-
+    print(qr_code)
     return render(request, 'restaurant/customer_menu.html', {
         'restaurant': restaurant,
         'table': table,
         'categories': categories,
         'cart': cart,
+        'qr_code': qr_code,
     })
 
 @require_POST
